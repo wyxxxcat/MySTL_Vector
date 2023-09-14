@@ -2,7 +2,18 @@
 #include<iostream>
 #include<memory>
 #include<type_traits>
-
+using void_func_type = std::function<void(int&)>;
+template<typename iter_type,typename func_type = void_func_type>
+void for_each(iter_type first,iter_type last,func_type func = [](int& elem){
+    std::cout<<elem<<' ';
+    ++elem;
+})
+{
+    for(auto iter = first;iter != last;++iter)
+    {
+        func(*iter);
+    }
+}
 template<typename T>
 struct get_type
 {
@@ -18,21 +29,36 @@ struct get_type<T*>
 template<typename T>
 class Vector
 {
+    using void_func_type = std::function<void(int&)>;
     using iterator = T*;
     using const_iterator = const T*;
 public:
+    T* data;
+    unsigned size_ = 0;
     Vector(unsigned count);
     Vector(const std::initializer_list<T>& list);
     Vector(const std::initializer_list<T>&& list);
     ~Vector();
     iterator begin();
     const_iterator cbegin() const;
-    T* data;
+    void push_back(const T& dt);
+    T size();
+    void setSize(const T& size_);
     T& operator[](unsigned count)
     {
         return data[count];
     }
 };
+template<typename T>
+void Vector<T>::setSize(const T& size_)
+{
+    this->size_ = size_;
+}
+template<typename T>
+T Vector<T>::size()
+{
+    return this->size_;
+}
 template<typename T>
 Vector<T>::Vector(unsigned count)
 {
@@ -43,6 +69,12 @@ Vector<T>::Vector(unsigned count)
     {
         data = nullptr;
     }
+}
+template<typename T>
+void Vector<T>::push_back(const T& dt)
+{
+    data[this->size_] = std::move(dt);
+    this->setSize(this->size_ + 1);
 }
 template<typename T>
 Vector<T>::~Vector()
@@ -68,22 +100,20 @@ Vector<T>::Vector(const std::initializer_list<T>& list)
 {
     if(list.size())
     {
-        unsigned cnt = 0;
         data = new T[list.size()]();
         if(std::is_pointer<T>::value)
         {
             for(auto item : list)
             {
-                data[cnt++] = new typename get_type<T>::type(*item);
+                data[this.size_ ++] = new typename get_type<T>::type(*item);
             }
         }else
         {
             for(const auto& item : list)
             {
-                data[cnt++] = item;
+                data[this.size_ ++] = item;
             }
         }
-        
     }else
     {
         data = nullptr;
@@ -94,11 +124,10 @@ Vector<T>::Vector(const std::initializer_list<T>&& list)
 {
     if(list.size())
     {
-        unsigned cnt = 0;
         data = new T[list.size()]();
         for(const auto& item : list)
         {   
-            data[cnt++] = item;
+            data[this->size_++] = item;
         }
     }else
     {
