@@ -9,7 +9,7 @@ void for_each(iter_type first,iter_type last,func_type func = [](int& elem){
     ++elem;
 })
 {
-    for(auto iter = first;iter != last;++iter)
+    for(auto iter = first;iter <= last;++iter)
     {
         func(*iter);
     }
@@ -40,22 +40,22 @@ public:
     Vector(const std::initializer_list<T>&& list);
     ~Vector();
     iterator begin();
+    iterator end();
     const_iterator cbegin() const;
     void push_back(const T& dt);
-    T size();
-    void setSize(const T& size_);
+    unsigned size();
     T& operator[](unsigned count)
     {
         return data[count];
     }
 };
 template<typename T>
-void Vector<T>::setSize(const T& size_)
+typename Vector<T>::iterator Vector<T>::end()
 {
-    this->size_ = size_;
+    return data + this->size_ - 1;
 }
 template<typename T>
-T Vector<T>::size()
+unsigned Vector<T>::size()
 {
     return this->size_;
 }
@@ -74,7 +74,7 @@ template<typename T>
 void Vector<T>::push_back(const T& dt)
 {
     data[this->size_] = std::move(dt);
-    this->setSize(this->size_ + 1);
+    this->size_++;
 }
 template<typename T>
 Vector<T>::~Vector()
@@ -100,18 +100,18 @@ Vector<T>::Vector(const std::initializer_list<T>& list)
 {
     if(list.size())
     {
-        data = new T[list.size()]();
+        data = new T[list.size() * 2]();
         if(std::is_pointer<T>::value)
         {
             for(auto item : list)
             {
-                data[this.size_ ++] = new typename get_type<T>::type(*item);
+                data[this->size_ ++] = new typename get_type<T>::type(*item);
             }
         }else
         {
             for(const auto& item : list)
             {
-                data[this.size_ ++] = item;
+                data[this->size_ ++] = std::move(item);
             }
         }
     }else
@@ -124,7 +124,7 @@ Vector<T>::Vector(const std::initializer_list<T>&& list)
 {
     if(list.size())
     {
-        data = new T[list.size()]();
+        data = new T[list.size() * 2]();
         for(const auto& item : list)
         {   
             data[this->size_++] = item;

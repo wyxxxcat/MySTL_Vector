@@ -1,21 +1,18 @@
 #include<memory>
+#include<iostream>
 #include<functional>
 #include<type_traits>
 #include<string>
+#include<algorithm>
 #include"Vector.h"
 int main()
 {
-    Vector<int> arr{1,2,3,4};
-    std::cout  << "arr.size() is " << arr.size() << std::endl;
-    std::cout  << " *arr.begin() is " << *arr.begin() << std::endl;
-    std::cout << "*arr.cbegin() is " << *arr.cbegin() << std::endl;
-    std::cout  << "arr[2] is " << arr[2] << std::endl;
-    
-    arr.push_back(3);
-    std::cout  << "arr.size() is " << arr.size() << std::endl;
-    for(int i = 0;i < 4;i ++)
+    Vector<int> a{1,2,4,5,6};
+    std::cout << a.size() << std::endl;
+    for_each(a.begin(),a.end(),[](int& x) ->void
     {
-        std::cout << arr[i] << ' ' << i << std::endl;
-    }
+        x%=2;
+    });
+    for_each(a.begin(),a.end());
     return 0;
 }
